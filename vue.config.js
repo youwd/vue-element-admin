@@ -30,11 +30,24 @@ module.exports = {
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
-    port: port,
+    port: 80,
     open: true,
+    https: true,
     overlay: {
       warnings: false,
       errors: true
+    },
+    /* 使用代理 */
+    proxy: {
+      "/dev-api": {
+        target: "https://e.fzkcy.com/gw/fzis/server/", //这里设置的地址会代替axios中设置的baseURL
+        // ws: true,
+        changeOrigin: true,
+        secure: true,
+        pathRewrite: {
+          '^/dev-api': '/'
+        }
+      }
     },
     before: require('./mock/mock-server.js')
   },
@@ -88,7 +101,7 @@ module.exports = {
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()
